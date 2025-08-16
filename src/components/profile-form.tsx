@@ -12,7 +12,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Loader2, Upload, Wand2, Sparkles, X } from 'lucide-react';
+import { Loader2, Upload, Wand2, Sparkles, X, FileCheck, ArrowRight } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import {
   Dialog,
@@ -23,6 +23,7 @@ import {
   DialogFooter,
   DialogClose,
 } from '@/components/ui/dialog';
+import type { ParseResumeOutput } from '@/ai/flows/parse-resume';
 
 interface ProfileFormProps {
   profile: Profile;
@@ -43,50 +44,69 @@ export function ProfileForm({ profile, setProfile, isLoading, setIsLoading }: Pr
 
   const [isSuggestingSkills, setIsSuggestingSkills] = useState(false);
   const [suggestedSkillsList, setSuggestedSkillsList] = useState<string[]>([]);
+
+  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+  const [parsedData, setParsedData] = useState<ParseResumeOutput | null>(null);
+  const [isParsing, setIsParsing] = useState(false);
   
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
-    setIsLoading(true);
+    setUploadedFile(file);
+    setParsedData(null);
+    setIsParsing(true);
+
     try {
       const reader = new FileReader();
       reader.onload = async (e) => {
         try {
           const dataUri = e.target?.result as string;
-          const parsedData = await parseResume({ resumeDataUri: dataUri });
-          
-          setProfile(prev => ({
-            ...prev,
-            name: parsedData.name || prev.name,
-            contactDetails: parsedData.contactDetails || prev.contactDetails,
-            workExperience: parsedData.workExperience || prev.workExperience,
-            education: parsedData.education || prev.education,
-            skills: parsedData.skills ? parsedData.skills.split(/, ?|\n/).filter(Boolean) : prev.skills,
-          }));
-          
-          setActiveTab('manual');
-          toast({ title: 'Resume Parsed!', description: 'Your profile has been populated with data from your resume.' });
+          const result = await parseResume({ resumeDataUri: dataUri });
+          setParsedData(result);
+          toast({ title: 'Resume Ready!', description: 'Click "Generate Profile" to continue.' });
         } catch (innerError) {
            console.error('Error parsing resume:', innerError);
-           toast({ variant: 'destructive', title: 'Parsing Error', description: 'Could not extract information from the resume. Please try manual entry.' });
+           toast({ variant: 'destructive', title: 'Parsing Error', description: 'Could not extract information from the resume. Please try another file or manual entry.' });
+           setUploadedFile(null);
         } finally {
-          setIsLoading(false);
+          setIsParsing(false);
         }
       };
       reader.onerror = () => {
-        setIsLoading(false);
+        setIsParsing(false);
+        setUploadedFile(null);
         toast({ variant: 'destructive', title: 'File Error', description: 'Could not read the selected file.' });
       }
       reader.readAsDataURL(file);
     } catch (error) {
       console.error(error);
       toast({ variant: 'destructive', title: 'Error', description: 'An unexpected error occurred.' });
-      setIsLoading(false);
+      setIsParsing(false);
+      setUploadedFile(null);
     } finally {
       if(fileInputRef.current) fileInputRef.current.value = '';
     }
   };
+
+  const handleGenerateProfile = () => {
+    if (!parsedData) return;
+    
+    setProfile(prev => ({
+      ...prev,
+      name: parsedData.name || prev.name,
+      contactDetails: parsedData.contactDetails || prev.contactDetails,
+      workExperience: parsedData.workExperience || prev.workExperience,
+      education: parsedData.education || prev.education,
+      skills: parsedData.skills ? parsedData.skills.split(/, ?|\n/).filter(Boolean) : prev.skills,
+    }));
+    
+    setActiveTab('manual');
+    toast({ title: 'Profile Generated!', description: 'Your profile has been populated. Review and edit below.' });
+    setUploadedFile(null);
+    setParsedData(null);
+  }
+
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -171,13 +191,28 @@ export function ProfileForm({ profile, setProfile, isLoading, setIsLoading }: Pr
           </TabsList>
           <TabsContent value="resume" className="mt-6">
             <div className="flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-muted-foreground/30 p-12 text-center h-full">
-              <Upload className="mx-auto h-12 w-12 text-muted-foreground" />
-              <h3 className="mt-4 text-lg font-medium">Upload your resume</h3>
-              <p className="mt-2 text-sm text-muted-foreground">PDFs and text-based documents work best.</p>
-              <Button onClick={() => fileInputRef.current?.click()} disabled={isLoading} className="mt-6 bg-primary hover:bg-primary/90 text-primary-foreground">
-                {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Upload className="mr-2 h-4 w-4" />}
-                {isLoading ? 'Parsing...' : 'Select File'}
-              </Button>
+              {!uploadedFile && (
+                <>
+                  <Upload className="mx-auto h-12 w-12 text-muted-foreground" />
+                  <h3 className="mt-4 text-lg font-medium">Upload your resume</h3>
+                  <p className="mt-2 text-sm text-muted-foreground">PDFs and text-based documents work best.</p>
+                  <Button onClick={() => fileInputRef.current?.click()} disabled={isParsing} className="mt-6 bg-primary hover:bg-primary/90 text-primary-foreground">
+                    <Upload className="mr-2 h-4 w-4" />
+                    Select File
+                  </Button>
+                </>
+              )}
+              {uploadedFile && (
+                <>
+                  <FileCheck className="mx-auto h-12 w-12 text-green-500" />
+                  <h3 className="mt-4 text-lg font-medium">{uploadedFile.name}</h3>
+                  <p className="mt-2 text-sm text-muted-foreground">Resume uploaded and ready to be parsed.</p>
+                  <Button onClick={handleGenerateProfile} disabled={isParsing || !parsedData} className="mt-6">
+                    {isParsing ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <ArrowRight className="mr-2 h-4 w-4" />}
+                    {isParsing ? 'Parsing...' : 'Generate Profile'}
+                  </Button>
+                </>
+              )}
               <Input
                 ref={fileInputRef}
                 type="file"
