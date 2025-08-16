@@ -5,7 +5,8 @@ import { Header } from '@/components/layout/header';
 import { ProfileForm } from '@/components/profile-form';
 import { ProfilePreview } from '@/components/profile-preview';
 import type { Profile } from '@/lib/types';
-import { Separator } from '@/components/ui/separator';
+import { regenerateProfile } from '@/ai/flows/regenerate-profile';
+import { useToast } from '@/hooks/use-toast';
 
 const initialProfile: Profile = {
   name: 'Jane Doe',
@@ -27,6 +28,35 @@ const initialProfile: Profile = {
 export default function Home() {
   const [profile, setProfile] = useState<Profile>(initialProfile);
   const [isLoading, setIsLoading] = useState(false);
+  const [isRegenerating, setIsRegenerating] = useState(false);
+  const { toast } = useToast();
+
+  const handleRegenerateProfile = async () => {
+    setIsRegenerating(true);
+    try {
+      const result = await regenerateProfile(profile);
+      setProfile(prev => ({
+        ...prev,
+        headline: result.headline,
+        summary: result.summary,
+        workExperience: result.enhancedWorkExperience,
+      }));
+      toast({
+        title: 'Profile Regenerated!',
+        description: 'Your headline, summary, and work experience have been updated.',
+      });
+    } catch (error) {
+      console.error('Error regenerating profile:', error);
+      toast({
+        variant: 'destructive',
+        title: 'Regeneration Error',
+        description: 'Could not regenerate the profile. Please try again.',
+      });
+    } finally {
+      setIsRegenerating(false);
+    }
+  };
+
 
   return (
     <div className="flex min-h-screen w-full flex-col bg-background">
@@ -59,7 +89,7 @@ export default function Home() {
                   See what your new profile looks like in real-time.
                 </p>
               </div>
-              <ProfilePreview profile={profile} />
+              <ProfilePreview profile={profile} onRegenerate={handleRegenerateProfile} isRegenerating={isRegenerating} />
             </div>
           </div>
         </div>

@@ -2,12 +2,15 @@ import Image from 'next/image';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { Briefcase, GraduationCap, Mail, Phone, User, Star, Linkedin } from 'lucide-react';
+import { Briefcase, GraduationCap, Mail, Phone, User, Star, Linkedin, RefreshCw } from 'lucide-react';
 import type { Profile } from '@/lib/types';
 import { CopyButton } from './copy-button';
+import { Button } from './ui/button';
 
 interface ProfilePreviewProps {
   profile: Profile;
+  onRegenerate: () => void;
+  isRegenerating: boolean;
 }
 
 const Section = ({ title, icon, content, textToCopy, isSkills = false }: { title: string, icon: React.ReactNode, content: React.ReactNode, textToCopy: string, isSkills?: boolean }) => (
@@ -25,7 +28,7 @@ const Section = ({ title, icon, content, textToCopy, isSkills = false }: { title
 );
 
 
-export function ProfilePreview({ profile }: ProfilePreviewProps) {
+export function ProfilePreview({ profile, onRegenerate, isRegenerating }: ProfilePreviewProps) {
   const formatText = (text: string) => {
     return text.split('\n').map((line, index, arr) => (
       <span key={index}>
@@ -39,7 +42,7 @@ export function ProfilePreview({ profile }: ProfilePreviewProps) {
 
   return (
     <Card className="overflow-hidden shadow-lg">
-      <div className="relative h-28 bg-muted">
+      <CardHeader className="relative p-0 h-28 bg-muted">
         <Image
           src="https://placehold.co/800x200.png"
           alt="Profile Banner"
@@ -47,7 +50,13 @@ export function ProfilePreview({ profile }: ProfilePreviewProps) {
           fill
           className="object-cover"
         />
-      </div>
+         <div className="absolute top-2 right-2">
+           <Button onClick={onRegenerate} disabled={isRegenerating} size="sm">
+            <RefreshCw className={`h-4 w-4 mr-2 ${isRegenerating ? 'animate-spin' : ''}`} />
+            {isRegenerating ? 'Regenerating...' : 'Regenerate Profile'}
+          </Button>
+        </div>
+      </CardHeader>
       <CardContent className="p-6 pt-0">
         <div className="relative -mt-14">
           <div className="h-28 w-28 rounded-full border-4 border-card bg-card overflow-hidden">
