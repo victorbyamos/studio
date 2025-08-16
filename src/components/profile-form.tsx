@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import type { Profile } from '@/lib/types';
 import { parseResume } from '@/ai/flows/parse-resume';
 import { enhanceProfile } from '@/ai/flows/enhance-profile';
@@ -14,6 +14,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Loader2, Upload, Wand2, Sparkles, X, FileCheck, ArrowRight } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
 import {
   Dialog,
   DialogContent,
@@ -48,6 +49,27 @@ export function ProfileForm({ profile, setProfile, isLoading, setIsLoading }: Pr
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [parsedData, setParsedData] = useState<ParseResumeOutput | null>(null);
   const [isParsing, setIsParsing] = useState(false);
+  const [progress, setProgress] = useState(0);
+
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+    if (isParsing) {
+      setProgress(0);
+      timer = setInterval(() => {
+        setProgress(prev => {
+          if (prev >= 95) {
+            clearInterval(timer);
+            return 95;
+          }
+          return prev + 5;
+        });
+      }, 200);
+    }
+    return () => {
+      clearInterval(timer);
+    };
+  }, [isParsing]);
+
   
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -56,6 +78,7 @@ export function ProfileForm({ profile, setProfile, isLoading, setIsLoading }: Pr
     setUploadedFile(file);
     setParsedData(null);
     setIsParsing(true);
+    setProgress(0);
 
     try {
       const reader = new FileReader();
@@ -64,6 +87,7 @@ export function ProfileForm({ profile, setProfile, isLoading, setIsLoading }: Pr
           const dataUri = e.target?.result as string;
           const result = await parseResume({ resumeDataUri: dataUri });
           setParsedData(result);
+          setProgress(100);
           toast({ title: 'Resume Ready!', description: 'Click "Generate Profile" to continue.' });
         } catch (innerError) {
            console.error('Error parsing resume:', innerError);
@@ -203,15 +227,24 @@ export function ProfileForm({ profile, setProfile, isLoading, setIsLoading }: Pr
                 </>
               )}
               {uploadedFile && (
-                <>
+                <div className="w-full flex flex-col items-center">
                   <FileCheck className="mx-auto h-12 w-12 text-green-500" />
                   <h3 className="mt-4 text-lg font-medium">{uploadedFile.name}</h3>
-                  <p className="mt-2 text-sm text-muted-foreground">Resume uploaded and ready to be parsed.</p>
-                  <Button onClick={handleGenerateProfile} disabled={isParsing || !parsedData} className="mt-6">
-                    {isParsing ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <ArrowRight className="mr-2 h-4 w-4" />}
-                    {isParsing ? 'Parsing...' : 'Generate Profile'}
-                  </Button>
-                </>
+                   {isParsing ? (
+                    <div className="w-full max-w-sm mt-4 text-center">
+                        <p className="text-sm text-muted-foreground mb-2">Extracting information...</p>
+                        <Progress value={progress} className="w-full" />
+                    </div>
+                  ) : (
+                    <>
+                      <p className="mt-2 text-sm text-muted-foreground">Resume uploaded and ready to be parsed.</p>
+                      <Button onClick={handleGenerateProfile} disabled={isParsing || !parsedData} className="mt-6">
+                        {isParsing ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <ArrowRight className="mr-2 h-4 w-4" />}
+                        {isParsing ? 'Parsing...' : 'Generate Profile'}
+                      </Button>
+                    </>
+                  )}
+                </div>
               )}
               <Input
                 ref={fileInputRef}
