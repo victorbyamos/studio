@@ -51,7 +51,8 @@ Given the user's profile information, regenerate the headline, summary, and work
 **User's Profile Data:**
 - Name: {{{name}}}
 - Target Industry: {{{industry}}}
-- Education: {{{education}}}
+- Education:
+{{{education}}}
 - Skills: {{#each skills}}{{{this}}}{{#unless @last}}, {{/unless}}{{/each}}
 - Work Experience:
 {{{workExperience}}}
