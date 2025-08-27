@@ -6,6 +6,7 @@ export function Header() {
       <div className="container mx-auto flex h-16 items-center justify-between px-4 md:px-8">
         <div className="flex items-center gap-2">
           <ProfileForgeLogo />
+          <span className="font-semibold">Powered by Blinkz Digital</span>
         </div>
       </div>
     </header>
