@@ -49,10 +49,9 @@ Given the user's profile information, regenerate the headline, summary, and work
 3.  **Work Experience:** Rewrite the work experience to focus on accomplishments, not just responsibilities. Use the STAR method (Situation, Task, Action, Result) where possible and start bullet points with strong action verbs. Quantify results with numbers and metrics.
 
 **User's Profile Data:**
-- Name: {{{name}}}
-- Target Industry: {{{industry}}}
-- Education:
-{{{education}}}
+- Name: {{name}}
+- Target Industry: {{industry}}
+- Education: {{education}}
 - Skills: {{#each skills}}{{{this}}}{{#unless @last}}, {{/unless}}{{/each}}
 - Work Experience:
 {{{workExperience}}}
