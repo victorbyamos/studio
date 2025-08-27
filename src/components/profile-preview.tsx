@@ -48,6 +48,7 @@ export function ProfilePreview({ profile, onRegenerate, isRegenerating }: Profil
           alt="Profile Banner"
           data-ai-hint="abstract banner"
           fill
+          sizes="100vw"
           className="object-cover"
         />
          <div className="absolute top-2 right-2">
