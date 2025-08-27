@@ -4,35 +4,22 @@ export function ProfileForgeLogo(props: SVGProps<SVGSVGElement>) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 128 128"
+      viewBox="0 0 256 256"
       width="40"
       height="40"
       {...props}
     >
       <defs>
-        <radialGradient
-          id="b-gradient"
-          cx="50%"
-          cy="50%"
-          r="50%"
-          fx="50%"
-          fy="50%"
-        >
-          <stop offset="0%" style={{ stopColor: "#FFD700", stopOpacity: 1 }} />
-          <stop
-            offset="100%"
-            style={{ stopColor: "#800080", stopOpacity: 1 }}
-          />
-        </radialGradient>
+        <linearGradient id="b-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" style={{ stopColor: "#3F51B5" }} />
+          <stop offset="100%" style={{ stopColor: "#FFAB40" }} />
+        </linearGradient>
       </defs>
-      <path
-        d="M60.8 23.2h-18.4v81.6h18.4c13.6 0 24.8-11.2 24.8-24.8v-32c0-13.6-11.2-24.8-24.8-24.8zm-8.8 72v-62.4h8.8c8.8 0 16 7.2 16 16v30.4c0 8.8-7.2 16-16 16h-8.8z"
-        fill="url(#b-gradient)"
-      />
-      <path
-        d="M26.4 23.2h-4.8v4.8h4.8v-4.8zm4.8 4.8h-4.8v4.8h4.8v-4.8zm-4.8 4.8h-4.8v4.8h4.8v-4.8zm4.8 4.8h-4.8v4.8h4.8v-4.8zm-9.6-14.4h-4.8v4.8h4.8v-4.8zm4.8 4.8h-4.8v4.8h4.8v-4.8z"
-        fill="black"
-      />
+      <g fill="url(#b-gradient)">
+        <path d="M128 24a104 104 0 1 0 104 104A104.11 104.11 0 0 0 128 24Zm0 192a88 88 0 1 1 88-88a88.1 88.1 0 0 1-88 88Z" />
+        <path d="M152 128a24 24 0 1 1-24-24a24 24 0 0 1 24 24Zm-24-8a8 8 0 1 0 8 8a8 8 0 0 0-8-8Z" />
+        <path d="M128 72a56 56 0 0 0-56 56a8 8 0 0 0 16 0a40 40 0 1 1 21.39 36.81a8 8 0 1 0-14.78 6.38A56.08 56.08 0 0 0 184 128a55.51 55.51 0 0 0-1.39-12.79a8 8 0 1 0-15.82 2.76A40 40 0 0 1 168 128a39.48 39.48 0 0 1-1.63 12.39a8 8 0 1 0-15.42 4.79A55.54 55.54 0 0 0 128 72Z" />
+      </g>
     </svg>
   );
 }

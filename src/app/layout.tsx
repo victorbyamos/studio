@@ -3,7 +3,7 @@ import './globals.css';
 import { Toaster } from "@/components/ui/toaster"
 
 export const metadata: Metadata = {
-  title: 'Blinkz Digital',
+  title: 'ProfileForge by Blinkz Digital',
   description: 'AI-Powered LinkedIn Profile Generator',
 };
 
