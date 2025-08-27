@@ -5,8 +5,8 @@ export function Header() {
     <header className="border-b bg-card sticky top-0 z-10 bg-background/80 backdrop-blur-sm">
       <div className="container mx-auto flex h-16 items-center justify-between px-4 md:px-8">
         <div className="flex items-center gap-2">
-          <ProfileForgeLogo className="h-8 w-8 text-primary" />
-          <h1 className="text-xl font-bold text-foreground">ProfileForge</h1>
+          <ProfileForgeLogo />
+          <h1 className="text-xl font-bold text-foreground">Blinkz Digital</h1>
         </div>
       </div>
     </header>

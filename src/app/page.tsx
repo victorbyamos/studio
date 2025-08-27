@@ -59,41 +59,39 @@ export default function Home() {
 
 
   return (
-    <div className="flex min-h-screen w-full flex-col bg-background">
+    <div className="flex w-full flex-col bg-background">
       <Header />
-      <main className="flex-1">
-        <div className="container mx-auto grid flex-1 gap-12 md:grid-cols-[3fr_2fr] p-4 md:p-8">
-          <div className="flex flex-col space-y-6">
+      <div className="container mx-auto grid flex-1 gap-12 md:grid-cols-[3fr_2fr] p-4 md:p-8">
+        <div className="flex flex-col space-y-6">
+          <div>
+            <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-foreground">
+              Profile Generator
+            </h1>
+            <p className="text-muted-foreground">
+              Upload your resume or fill out the fields to generate your professional profile.
+            </p>
+          </div>
+          <ProfileForm 
+            profile={profile} 
+            setProfile={setProfile} 
+            isLoading={isLoading}
+            setIsLoading={setIsLoading}
+          />
+        </div>
+        <div className="hidden md:block">
+          <div className="sticky top-8 space-y-6">
             <div>
-              <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-foreground">
-                Profile Generator
-              </h1>
+              <h2 className="text-2xl md:text-3xl font-bold tracking-tight">
+                Live Preview
+              </h2>
               <p className="text-muted-foreground">
-                Upload your resume or fill out the fields to generate your professional profile.
+                See what your new profile looks like in real-time.
               </p>
             </div>
-            <ProfileForm 
-              profile={profile} 
-              setProfile={setProfile} 
-              isLoading={isLoading}
-              setIsLoading={setIsLoading}
-            />
-          </div>
-          <div className="hidden md:block">
-            <div className="sticky top-8 space-y-6">
-              <div>
-                <h2 className="text-2xl md:text-3xl font-bold tracking-tight">
-                  Live Preview
-                </h2>
-                <p className="text-muted-foreground">
-                  See what your new profile looks like in real-time.
-                </p>
-              </div>
-              <ProfilePreview profile={profile} onRegenerate={handleRegenerateProfile} isRegenerating={isRegenerating} />
-            </div>
+            <ProfilePreview profile={profile} onRegenerate={handleRegenerateProfile} isRegenerating={isRegenerating} />
           </div>
         </div>
-      </main>
+      </div>
     </div>
   );
 }
