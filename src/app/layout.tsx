@@ -22,9 +22,6 @@ export default function RootLayout({
       <body className="font-body antialiased">
         <div className="flex flex-col min-h-screen">
           <main className="flex-1">{children}</main>
-          <footer className="py-4 text-center text-sm text-muted-foreground">
-            Powered by Blinkz Digitals
-          </footer>
         </div>
         <Toaster />
       </body>
